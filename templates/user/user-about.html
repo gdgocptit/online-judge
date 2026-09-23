@@ -259,7 +259,8 @@
                                 $tooltip.find('.date').text(item.date);
                                 $tooltip.find('.rate-box').attr('class', 'rate-box ' + item.class)
                                         .find('span').css('height', item.height);
-                                $tooltip.find('.rating').text(item.rating).attr('class', 'rating ' + item.class);
+                                $tooltip.find('.rating').text(item.rating + ' · ' + item.rank_short_name)
+                                        .attr('class', 'rating ' + item.class).attr('title', item.rank_name);
                                 $tooltip.find('.rank').text(item.ranking);
 
                                 $tooltip.removeClass('above below');
@@ -277,41 +278,9 @@
                             },
                         },
                         yHighlight: [
-                            {
-                                begin: 0,
-                                end: 1000,
-                                color: 'rgb(153, 153, 153, 0.43)'
-                            },
-                            {
-                                begin: 1000,
-                                end: 1300,
-                                color: 'rgb(0, 169, 0, 0.4)'
-                            },
-                            {
-                                begin: 1300,
-                                end: 1600,
-                                color: 'rgb(0, 0, 255, 0.4)'
-                            },
-                            {
-                                begin: 1600,
-                                end: 1900,
-                                color: 'rgb(128, 0, 128, 0.37)'
-                            },
-                            {
-                                begin: 1900,
-                                end: 2400,
-                                color: 'rgb(255, 177, 0, 0.4)'
-                            },
-                            {
-                                begin: 2400,
-                                end: 3000,
-                                color: 'rgb(238, 0, 0, 0.4)'
-                            },
-                            {
-                                begin: 3000,
-                                end: 4000,
-                                color: 'rgb(160, 0, 0, 0.6)'
-                            }
+                            {begin: 0, end: 2200, color: 'rgba(153, 153, 153, 0.25)'},
+                            {begin: 2200, end: 2800, color: 'rgba(0, 0, 255, 0.25)'},
+                            {begin: 2800, end: Infinity, color: 'rgba(238, 0, 0, 0.25)'}
                         ],
                     }
                 });

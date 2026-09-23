@@ -1,17 +1,12 @@
 from django.utils.translation import gettext_lazy as _
 
-from judge.ratings import rating_class, rating_name, rating_progress
+from judge.ratings import rating_class, rating_name, rating_progress, rating_short_name
 from . import registry
 
 
 def _get_rating_value(func, obj):
-    if obj is None:
-        return None
-
-    if isinstance(obj, int):
-        return func(obj)
-    else:
-        return func(obj.rating)
+    value = obj if isinstance(obj, int) else getattr(obj, 'rating', None)
+    return None if value is None else func(value)
 
 
 @registry.function('rating_class')
@@ -27,6 +22,11 @@ def get_name(obj):
 @registry.function(name='rating_progress')
 def get_progress(obj):
     return _get_rating_value(rating_progress, obj) or 0.0
+
+
+@registry.function(name='rating_short_name')
+def get_short_name(obj):
+    return _get_rating_value(rating_short_name, obj) or _('Unrated')
 
 
 @registry.function

@@ -195,18 +195,18 @@ def rate_contest(contest):
                             .order_by('-contest__end_time').values('rating')[:1]))
 
 
-RATING_LEVELS = [
-    gettext_lazy('Newbie'),
-    gettext_lazy('Amateur'),
-    gettext_lazy('Expert'),
-    gettext_lazy('Candidate Master'),
-    gettext_lazy('Master'),
-    gettext_lazy('Grandmaster'),
-    gettext_lazy('Target'),
-]
-RATING_VALUES = [1000, 1300, 1600, 1900, 2400, 3000]
-RATING_CLASS = ['rate-newbie', 'rate-amateur', 'rate-expert', 'rate-candidate-master',
-                'rate-master', 'rate-grandmaster', 'rate-target']
+# 0-10 is 30k, 11-20 is 29k, ..., 91-199 is 21k; 200 is 20k.
+# Each subsequent rank costs 100 rating, up to 9P at 3600.
+RATING_VALUES = [*range(11, 92, 10), *range(200, 3601, 100)]
+RATING_LEVELS = (
+    [gettext_lazy('%(rank)d kyu') % {'rank': rank} for rank in range(30, 0, -1)] +
+    [gettext_lazy('%(rank)d dan') % {'rank': rank} for rank in range(1, 7)] +
+    [gettext_lazy('%(rank)d Pro dan') % {'rank': rank} for rank in range(1, 10)]
+)
+RATING_SHORT_NAMES = ([f'{rank}k' for rank in range(30, 0, -1)] +
+                      [f'{rank}d' for rank in range(1, 7)] +
+                      [f'{rank}P' for rank in range(1, 10)])
+RATING_CLASS = ['rate-kyu'] * 30 + ['rate-dan'] * 6 + ['rate-pro-dan'] * 9
 
 
 def rating_level(rating):
@@ -215,6 +215,10 @@ def rating_level(rating):
 
 def rating_name(rating):
     return RATING_LEVELS[rating_level(rating)]
+
+
+def rating_short_name(rating):
+    return RATING_SHORT_NAMES[rating_level(rating)]
 
 
 def rating_class(rating):
@@ -227,4 +231,4 @@ def rating_progress(rating):
         return 1.0
     prev = 0 if not level else RATING_VALUES[level - 1]
     next = RATING_VALUES[level]
-    return (rating - prev + 0.0) / (next - prev)
+    return max(0.0, (rating - prev) / (next - prev))

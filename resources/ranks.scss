@@ -36,36 +36,10 @@ svg.rate-box {
         @include rate-svg-color($color_primary0);
     }
 
-    &.rate-newbie {
-        @include rate-svg-color($color_rating_newbie);
-    }
+    &.rate-kyu { @include rate-svg-color($color_rating_kyu); }
+    &.rate-dan { @include rate-svg-color($color_rating_dan); }
+    &.rate-pro-dan { @include rate-svg-color($color_rating_pro_dan); }
 
-    &.rate-amateur {
-        @include rate-svg-color($color_rating_amateur);
-    }
-
-    &.rate-expert {
-        @include rate-svg-color($color_rating_expert);
-    }
-
-    &.rate-candidate-master {
-        @include rate-svg-color($color_rating_candidate_master);
-    }
-
-    &.rate-master {
-        @include rate-svg-color($color_rating_master);
-    }
-
-    &.rate-grandmaster, &.rate-target {
-        @include rate-svg-color($color_rating_grandmaster);
-    }
-
-    &.rate-target {
-        circle:last-child {
-            stroke: none;
-            fill: $color_rating_grandmaster;
-        }
-    }
 }
 
 .rating {
@@ -81,33 +55,9 @@ svg.rate-box {
     font-weight: normal;
 }
 
-.rate-newbie, .rate-newbie a {
-    color: $color_rating_newbie;
-}
-
-.rate-amateur, .rate-amateur a {
-    color: $color_rating_amateur;
-}
-
-.rate-expert, .rate-expert a {
-    color: $color_rating_expert;
-}
-
-.rate-candidate-master, .rate-candidate-master a {
-    color: $color_rating_candidate_master;
-}
-
-.rate-master, .rate-master a {
-    color: $color_rating_master;
-}
-
-.rate-grandmaster, .rate-grandmaster a, .rate-target, .rate-target a {
-    color: $color_rating_grandmaster;
-}
-
-.rate-target a::first-letter {
-    color: $color_rating_target;
-}
+.rate-kyu, .rate-kyu a { color: $color_rating_kyu; }
+.rate-dan, .rate-dan a { color: $color_rating_dan; }
+.rate-pro-dan, .rate-pro-dan a { color: $color_rating_pro_dan; }
 
 .rate-group {
     white-space: nowrap;

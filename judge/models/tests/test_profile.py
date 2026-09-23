@@ -116,11 +116,11 @@ class ProfileTestCase(CommonDataMixin, TestCase):
         )
         self.assertEqual(
             Profile.get_user_css_class(display_rank='admin', rating=1300, rating_colors=True),
-            'rating rate-expert admin',
+            'rating rate-kyu admin',
         )
         self.assertEqual(
             Profile.get_user_css_class(display_rank=1111, rating=1299, rating_colors=True),
-            'rating rate-amateur 1111',
+            'rating rate-kyu 1111',
         )
         self.assertEqual(
             Profile.get_user_css_class(display_rank='random', rating=1299, rating_colors=False),

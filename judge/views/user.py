@@ -34,7 +34,7 @@ from reversion import revisions
 from judge.forms import CustomAuthenticationForm, DownloadDataForm, EmailChangeForm, ProfileForm, newsletter_id
 from judge.models import Profile, Submission
 from judge.performance_points import get_pp_breakdown
-from judge.ratings import rating_class, rating_progress
+from judge.ratings import rating_class, rating_name, rating_progress, rating_short_name
 from judge.tasks import prepare_user_data
 from judge.utils.celery import task_status_by_id, task_status_url_by_id
 from judge.utils.infinite_paginator import InfinitePaginationMixin
@@ -170,6 +170,8 @@ class UserAboutPage(UserPage):
         context['rating_data'] = mark_safe(json.dumps([{
             'label': rating.contest.name,
             'rating': rating.rating,
+            'rank_name': str(rating_name(rating.rating)),
+            'rank_short_name': rating_short_name(rating.rating),
             'ranking': rating.rank,
             'link': '%s#!%s' % (reverse('contest_ranking', args=(rating.contest.key,)), self.object.user.username),
             'timestamp': (rating.contest.end_time - EPOCH).total_seconds() * 1000,
