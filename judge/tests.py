@@ -1,3 +1,4 @@
+import re
 from unittest.mock import patch
 
 from django.contrib.auth.models import User
@@ -5,6 +6,47 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from judge.models import Judge, Language, Problem, ProblemGroup, Profile, Submission
+from judge.views.user import UserList
+
+
+@override_settings(ALLOWED_HOSTS=['testserver'],
+                   CACHES={'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}})
+class UserLeaderboardTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        for name, rating, points, problems in [
+            ('unrated', None, 9999, 20),
+            ('lower-rating', 1200, 900, 90),
+            ('fewer-problems', 1600, 200, 2),
+            ('tied-first', 1600, 200, 3),
+            ('tied-second', 1600, 200, 3),
+            ('higher-points', 1600, 300, 1),
+            ('higher-rating', 1800, 10, 1),
+            ('zero-rating', 0, 5000, 40),
+        ]:
+            Profile.objects.create(user=User.objects.create_user(username=name), rating=rating,
+                                   performance_points=points, problem_count=problems)
+        cls.expected = ['higher-rating', 'higher-points', 'tied-first', 'tied-second',
+                        'fewer-problems', 'lower-rating', 'zero-rating', 'unrated']
+
+    def test_rating_then_points_then_problems(self):
+        response = self.client.get(reverse('user_list'))
+        self.assertEqual([user.user.username for user in response.context['page_obj']], self.expected)
+        self.assertContains(response, 'class="header rating-column"')
+        self.assertContains(response, 'Rating')
+        rows = re.findall(r'<tr id="user-([^"]+)"[^>]*>\s*<td>(\d+)</td>', response.content.decode())
+        self.assertEqual(rows, list(zip(self.expected, ['1', '2', '3', '3', '5', '6', '7', '8'])))
+        response = self.client.get(reverse('user_list'), {'order': '-problem_count'})
+        self.assertEqual(response.context['page_obj'][0].user.username, 'lower-rating')
+
+    @patch.object(UserList, 'paginate_by', 2)
+    def test_handle_search_targets_sorted_page(self):
+        for index, name in enumerate(self.expected):
+            with self.subTest(name=name):
+                page = index // 2 + 1
+                query = f'?page={page}' if page > 1 else ''
+                response = self.client.get(reverse('user_ranking_redirect'), {'handle': name})
+                self.assertEqual(response.url, f'{reverse("user_list")}{query}#!{name}')
 
 
 @override_settings(ALLOWED_HOSTS=['testserver'],
