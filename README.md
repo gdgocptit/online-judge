@@ -1,3 +1,5 @@
+GDG on Campus: PTIT customization — [Local development](dev/README.md).
+
 <h1 align="center">
   <img src="https://github.com/DMOJ/online-judge/blob/master/logo.png?raw=true" width="120px">
   <br>

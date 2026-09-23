@@ -1,5 +1,29 @@
 @use "vars" as *;
 
+@font-face {
+    font-family: "GitLab Sans";
+    src: url("#{$path_to_root}/fonts/gitlab-sans/GitLabSans.woff2") format("woff2");
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "GitLab Sans";
+    src: url("#{$path_to_root}/fonts/gitlab-sans/GitLabSans-Italic.woff2") format("woff2");
+    font-style: italic;
+    font-weight: 100 900;
+    font-display: swap;
+}
+
+button, input, select, textarea {
+    font-family: inherit;
+}
+
+pre, code, kbd, samp {
+    font-family: $monospace-fonts;
+}
+
 @-ms-viewport {
     min-width: 480px;
     max-width: device-width;
@@ -110,7 +134,7 @@ body {
     font-size: $base_font_size;
     line-height: 1.231;
     background: $color_primary5;
-    font-family: "Segoe UI", "Lucida Grande", Arial, sans-serif;
+    font-family: $sans-serif-fonts;
     color: $color_primary100;
     height: 100%;
 }
@@ -189,7 +213,7 @@ a {
 }
 
 noscript #noscript {
-    font-family: Arial, sans-serif;
+    font-family: $sans-serif-fonts;
     font-size: 111%;
     color: white;
     font-weight: bold;
@@ -203,7 +227,7 @@ noscript #noscript {
 }
 
 #announcement {
-    font-family: Arial, sans-serif;
+    font-family: $sans-serif-fonts;
     font-size: 111%;
     color: white;
     font-weight: bold;

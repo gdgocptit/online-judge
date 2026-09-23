@@ -1,5 +1,25 @@
 @use "vars" as *;
 
+@font-face {
+    font-family: "Geist Mono";
+    src: url("#{$path_to_root}/fonts/geist-mono/GeistMono.woff2") format("woff2");
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Geist Mono";
+    src: url("#{$path_to_root}/fonts/geist-mono/GeistMono-Italic.woff2") format("woff2");
+    font-style: italic;
+    font-weight: 100 900;
+    font-display: swap;
+}
+
+body .ace_editor, .django-ace-editor textarea {
+    font-family: $monospace-fonts;
+}
+
 .django-ace-widget {
     display: inline-block;
     position: relative;
