@@ -1,1 +1,81 @@
-# Create your tests here.
+from unittest.mock import patch
+
+from django.contrib.auth.models import User
+from django.test import TestCase, override_settings
+from django.urls import reverse
+
+from judge.models import Judge, Language, Problem, ProblemGroup, Profile, Submission
+
+
+@override_settings(ALLOWED_HOSTS=['testserver'],
+                   CACHES={'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}})
+class ProblemWorkspaceTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.language, _ = Language.objects.update_or_create(
+            key='CPP17', defaults={'name': 'C++17', 'ace': 'c_cpp', 'common_name': 'C++'},
+        )
+        cls.other_language, _ = Language.objects.update_or_create(
+            key='PY3', defaults={'name': 'Python 3', 'ace': 'python', 'common_name': 'Python'},
+        )
+        cls.user = User.objects.create_user(username='workspace-user')
+        cls.profile = Profile.objects.create(user=cls.user, language=cls.language)
+        cls.problem = Problem.objects.create(
+            code='workspace', name='Workspace problem', description='Read the statement here.',
+            group=ProblemGroup.objects.create(name='test', full_name='Test'),
+            time_limit=1, memory_limit=65536, points=100, is_public=True,
+        )
+        cls.problem.allowed_languages.add(cls.language)
+        cls.judge = Judge.objects.create(name='workspace-judge', auth_key='test-only', online=True)
+        cls.judge.problems.add(cls.problem)
+        cls.judge.runtimes.add(cls.language, cls.other_language)
+        cls.url = reverse('problem_detail', args=[cls.problem.code])
+        cls.submit_url = reverse('problem_submit', args=[cls.problem.code])
+
+    def test_guest_sees_statement_and_login(self):
+        response = self.client.get(self.url)
+        self.assertContains(response, 'Read the statement here.')
+        self.assertContains(response, 'Sign in to write and submit your solution.')
+        self.assertNotContains(response, 'id="problem_submit"')
+
+    def test_authenticated_workspace_uses_submission_endpoint(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertContains(response, 'class="problem-workspace"')
+        self.assertContains(response, f'action="{self.submit_url}"')
+        self.assertContains(response, "name='csrfmiddlewaretoken'")
+        self.assertEqual(list(response.context['form'].fields['language'].queryset), [self.language])
+        self.assertContains(response, 'type="submit"')
+
+    def test_offline_judge_keeps_editor_but_disables_submission(self):
+        Judge.objects.filter(pk=self.judge.pk).update(online=False)
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertContains(response, 'id="ace_source"')
+        self.assertEqual(list(response.context['editor_languages']), [self.language])
+        self.assertContains(response, 'No judge is available for this problem.')
+        self.assertFalse(response.context['form'].fields['language'].queryset.exists())
+
+    def test_private_problem_remains_inaccessible(self):
+        Problem.objects.filter(pk=self.problem.pk).update(is_public=False)
+        self.client.force_login(self.user)
+        self.assertEqual(self.client.get(self.url).status_code, 404)
+
+    def test_invalid_language_does_not_create_submission(self):
+        self.client.force_login(self.user)
+        response = self.client.post(self.submit_url, {'language': self.other_language.pk, 'source': 'print(1)'})
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('language', response.context['form'].errors)
+        self.assertContains(response, 'print(1)')
+        self.assertFalse(Submission.objects.exists())
+
+    @patch.object(Submission, 'judge')
+    def test_valid_submission_keeps_existing_dispatch(self, dispatch):
+        self.client.force_login(self.user)
+        response = self.client.post(self.submit_url, {'language': self.language.pk, 'source': 'int main() {}'})
+        submission = Submission.objects.get()
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('submission_status', args=[submission.pk]))
+        self.assertEqual(submission.source.source, 'int main() {}')
+        self.assertEqual(submission.problem, self.problem)
+        dispatch.assert_called_once_with(force_judge=True, judge_id='')

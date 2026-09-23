@@ -215,7 +215,6 @@ ul.problem-list {
 
     .button {
         display: inline-block !important;
-        padding: 6px 12px;
     }
 
     .submit-bar {
@@ -232,6 +231,176 @@ ul.problem-list {
         #id_language {
             width: 100%;
         }
+    }
+}
+
+body[data-layout^="problem"] {
+    max-width: none;
+    overflow: hidden;
+
+    #page-container { border: 0; }
+    #page-container > br, footer { display: none; }
+
+    #content {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: calc(100dvh - 44px);
+        min-height: 0;
+        margin: 44px 0 0;
+        padding: 0;
+    }
+
+    #content > hr { margin: 0; }
+    #content-body { display: flex; flex: 1; min-height: 0; padding: 0; }
+    .problem-title h2 { margin: 0; font-size: 1.5em; }
+}
+
+body[data-layout="problem-contest"] #content {
+    margin-top: 70px;
+    height: calc(100dvh - 70px);
+}
+
+.workspace-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.submission-tools, #problem_submit .submit-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.submission-controls { padding: 16px 0; }
+.submission-tools { margin-bottom: 20px; }
+.source-upload {
+    position: relative;
+    cursor: pointer;
+    flex-shrink: 0;
+    i { margin-right: 6px; }
+    input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+    &:focus-within { outline: 2px solid $color_link75; outline-offset: 3px; }
+}
+
+.problem-workspace {
+    position: relative;
+    display: grid;
+    flex: 1;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    min-height: 0;
+    background: $color_primary0;
+
+    .problem-statement, #problem-editor {
+        min-width: 0;
+        min-height: 0;
+        box-sizing: border-box;
+        overflow: auto;
+    }
+
+    .problem-statement { padding: 24px 32px; }
+    .problem-title { padding: 0 0 20px; }
+    .problem-limits {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 20px;
+        color: $color_primary75;
+        font-size: 0.9em;
+        margin-bottom: 24px;
+    }
+    .content-description { display: flow-root; }
+    .comment-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin: 20px 0;
+
+        h2 { margin: 0; }
+        .clarify { float: none; }
+    }
+
+    #problem-editor {
+        grid-column: 2;
+        display: flex;
+        flex-direction: column;
+        border-left: 1px solid $color_primary25;
+    }
+
+    #problem_submit {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        min-height: 0;
+        padding: 0;
+        margin: 0;
+        max-width: none;
+        background: transparent;
+        border: 0;
+
+        #submit-wrapper { display: flex; flex: 1; min-height: 0; margin: 0; }
+        #editor { flex: 1; min-width: 0; min-height: 0; margin: 0; }
+        .django-ace-editor { display: flex; flex-direction: column; height: 100%; }
+        .django-ace-toolbar { display: none; }
+        .django-ace-widget { flex: 1; min-height: 0; height: auto !important; width: 100% !important; }
+
+        #language { margin: 0 0 0 auto; width: 220px; max-width: 100%; min-width: 0; }
+        #language .select2-container { width: 100% !important; }
+        .language-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+        .submission-controls { padding: 16px 24px; border-top: 1px solid $color_primary25; }
+        .submission-tools { flex-wrap: nowrap; gap: 12px; margin-bottom: 16px; }
+        .submit-bar { float: none; }
+        .submission-availability { color: $color_primary75; font-size: 0.9em; flex: 1; }
+    }
+
+    .editor-toggle {
+        position: absolute;
+        z-index: 10;
+        top: 50%;
+        left: 50%;
+        transform: translate(-100%, -50%);
+        width: 30px;
+        height: 56px;
+        padding: 0;
+        border: 0;
+        border-radius: 28px 0 0 28px;
+        cursor: pointer;
+        font-size: 24px;
+        &:focus-visible { outline: 2px solid white; outline-offset: -4px; }
+    }
+
+    &.editor-collapsed {
+        grid-template-columns: minmax(0, 1fr) 0;
+        #problem-editor { display: none; }
+        .editor-toggle { left: 100%; }
+        .editor-toggle i { transform: rotate(180deg); }
+    }
+
+    .editor-sign-in { margin: auto; padding: 24px; text-align: center; }
+}
+
+@media (max-width: 900px) {
+    body[data-layout^="problem"] {
+        overflow: auto;
+        #content { height: auto; }
+    }
+    .problem-workspace, .problem-workspace.editor-collapsed {
+        grid-template-columns: minmax(0, 1fr);
+        height: auto;
+        .editor-toggle { display: none; }
+        .problem-statement { display: block; padding: 20px; }
+        #problem-editor { grid-column: 1; height: 620px; border-left: 0; }
+        #problem_submit .submission-controls { padding: 16px; }
+        #language { width: 160px; }
     }
 }
 

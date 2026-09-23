@@ -9,14 +9,14 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
-from django.db.models import Q
+from django.db.models import Prefetch, Q
 from django.forms import BooleanField, CharField, ChoiceField, Form, ModelForm, MultipleChoiceField
 from django.urls import reverse_lazy
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _, ngettext_lazy
 
 from judge.models import Contest, Language, Organization, Problem, ProblemPointsVote, Profile, Submission, \
-    WebAuthnCredential
+    RuntimeVersion, WebAuthnCredential
 from judge.utils.mail import validate_email_domain
 from judge.utils.subscription import newsletter_id
 from judge.widgets import AceWidget, MartorWidget, Select2MultipleWidget, Select2Widget
@@ -151,6 +151,16 @@ class ProblemSubmitForm(ModelForm):
         self.fields['language'].empty_label = None
         self.fields['language'].label_from_instance = attrgetter('display_name')
         self.fields['language'].queryset = Language.objects.filter(judges__online=True).distinct()
+
+        if self.instance.problem_id and self.instance.user_id:
+            self.fields['language'].queryset = (
+                self.instance.problem.usable_languages.order_by('name', 'key')
+                .prefetch_related(Prefetch('runtimeversion_set', RuntimeVersion.objects.order_by('priority')))
+            )
+            language = self.initial.get('language')
+            if isinstance(language, Language):
+                self.fields['source'].widget.mode = language.ace
+            self.fields['source'].widget.theme = self.instance.user.resolved_ace_theme
 
         if judge_choices:
             self.fields['judge'].widget = Select2Widget(

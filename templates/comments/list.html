@@ -1,5 +1,8 @@
 <div id="comments" class="comment-area">
-    <h2><i style="padding-right: 0.3em" class="fa fa-comments"></i>{{ _('Comments') }}</h2>
+    <div class="comment-heading">
+        <h2><i style="padding-right: 0.3em" class="fa fa-comments"></i>{{ _('Comments') }}</h2>
+        {{ comment_header_actions|default('') }}
+    </div>
 
     {% if not comment_lock and not has_comments %}
         <p class="no-comments-message">{{ _('There are no comments at the moment.') }}</p>

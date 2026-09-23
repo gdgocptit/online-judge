@@ -1,0 +1,70 @@
+    {% if not no_judges %}
+        {% if default_lang not in form.fields.language.queryset %}
+            <div class="alert alert-warning alert-dismissable">
+                <a class="close">x</a>
+                <b>{{ _('Warning!') }}</b>
+                {{ _('Your default language, %(language)s, is unavailable for this problem and has been deselected.', language=bold(default_lang.name)) }}
+            </div>
+        {% endif %}
+
+        {% if request.in_contest and submission_limit %}
+            {% if submissions_left > 0 %}
+                <div class="alert alert-warning alert-dismissable">
+                    <a class="close">x</a>
+                    {% trans left=submissions_left -%}
+                        You have {{ left }} submission left
+                        {%- pluralize -%}
+                        You have {{ left }} submissions left
+                    {%- endtrans %}
+                </div>
+            {% else %}
+                <div class="alert alert-warning alert-dismissable">
+                    <a class="close">x</a>
+                    {{ _('You have 0 submissions left') }}
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+
+    <form id="problem_submit" action="{{ url('problem_submit', problem.code) if problem is defined else '' }}" method="post" class="form-area">
+        {% csrf_token %}
+        {{ form.non_field_errors() }}
+        <div id="submit-wrapper">
+            <div id="editor">
+                {{ form.source.errors }}
+                {{ form.source }}
+            </div>
+        </div>
+        <div class="submission-controls">
+            <div class="submission-tools">
+                <label class="button source-upload" for="source-file">
+                    <i class="fa fa-upload" aria-hidden="true"></i> {{ _('Upload file') }}
+                    <input id="source-file" type="file" aria-label="{{ _('Upload source file') }}">
+                </label>
+                <div id="language">
+                    {{ form.language.errors }}
+                    <label class="language-label" for="id_language">{{ _('Language') }}</label>
+                    <div id="language-select">
+                        <select id="id_language" name="language">
+                            {% for lang in editor_languages %}
+                                <option value="{{ lang.id }}" data-id="{{ lang.id }}" data-name="{{ lang.name }}"
+                                        data-info="{{ lang.info }}" data-ace="{{ lang.ace }}"
+                                        data-judge-info="{{ runtime_versions(lang.runtime_versions()) }}"
+                                        {% if lang.id|string == form.language.value()|string %}selected{% endif %}>{{ lang.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="submit-bar">
+                <span class="submission-availability" role="status">
+                    {% if no_judges %}{{ _('No judge is available for this problem.') }}{% endif %}
+                </span>
+                {% if not no_judges %}{{ form.judge }}{% endif %}
+                <button type="submit" class="button{% if no_judges or (request.in_contest and submission_limit and not submissions_left) %} disabled{% endif %}"
+                        {% if no_judges or (request.in_contest and submission_limit and not submissions_left) %}disabled{% endif %}>
+                    {{ _('Submit solution') }}
+                </button>
+            </div>
+        </div>
+    </form>

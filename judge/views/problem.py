@@ -10,7 +10,7 @@ from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.db import transaction
-from django.db.models import BooleanField, Case, CharField, Count, F, FilteredRelation, Prefetch, Q, When
+from django.db.models import BooleanField, Case, CharField, Count, F, FilteredRelation, Q, When
 from django.db.models.functions import Coalesce
 from django.db.utils import ProgrammingError
 from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect, JsonResponse
@@ -29,7 +29,7 @@ from reversion import revisions
 from judge.comments import CommentedDetailView
 from judge.forms import ProblemCloneForm, ProblemPointsVoteForm, ProblemSubmitForm
 from judge.models import ContestSubmission, Judge, Language, Problem, ProblemGroup, ProblemPointsVote, \
-    ProblemTranslation, ProblemType, RuntimeVersion, Solution, Submission, SubmissionSource
+    ProblemTranslation, ProblemType, Solution, Submission, SubmissionSource
 from judge.utils.diggpaginator import DiggPaginator
 from judge.utils.opengraph import generate_opengraph
 from judge.utils.pdfoid import PDF_RENDERING_ENABLED, render_pdf
@@ -173,6 +173,16 @@ class ProblemDetail(ProblemMixin, SolvedProblemMixin, CommentedDetailView):
 
         can_edit = self.object.is_editable_by(user)
         context['can_edit_problem'] = can_edit
+        if authed:
+            form = ProblemSubmitForm(
+                instance=Submission(user=user.profile, problem=self.object),
+                initial={'language': user.profile.language},
+                judge_choices=(tuple(context['available_judges'].values_list('name', 'name')) if can_edit else ()),
+            )
+            context.update(form=form, default_lang=user.profile.language,
+                           no_judges=not form.fields['language'].queryset.exists(), ACE_URL=settings.ACE_URL)
+            context['editor_languages'] = (self.object.allowed_languages.order_by('name', 'key')
+                                           if context['no_judges'] else form.fields['language'].queryset)
         if user.is_authenticated:
             tickets = self.object.tickets
             if not can_edit:
@@ -677,21 +687,6 @@ class ProblemSubmit(LoginRequiredMixin, ProblemMixin, TitleMixin, SingleObjectFo
 
         return kwargs
 
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-
-        form.fields['language'].queryset = (
-            self.object.usable_languages.order_by('name', 'key')
-            .prefetch_related(Prefetch('runtimeversion_set', RuntimeVersion.objects.order_by('priority')))
-        )
-
-        form_data = getattr(form, 'cleaned_data', form.initial)
-        if 'language' in form_data:
-            form.fields['source'].widget.mode = form_data['language'].ace
-        form.fields['source'].widget.theme = self.request.profile.resolved_ace_theme
-
-        return form
-
     def get_success_url(self):
         return reverse('submission_status', args=(self.new_submission.id,))
 
@@ -749,6 +744,8 @@ class ProblemSubmit(LoginRequiredMixin, ProblemMixin, TitleMixin, SingleObjectFo
         context = super().get_context_data(**kwargs)
         context['langs'] = Language.objects.all()
         context['no_judges'] = not context['form'].fields['language'].queryset
+        context['editor_languages'] = (self.object.allowed_languages.order_by('name', 'key')
+                                       if context['no_judges'] else context['form'].fields['language'].queryset)
         context['submission_limit'] = self.contest_problem and self.contest_problem.max_submissions
         context['submissions_left'] = self.remaining_submission_count
         context['ACE_URL'] = settings.ACE_URL
