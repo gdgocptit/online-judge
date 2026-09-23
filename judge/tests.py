@@ -9,6 +9,37 @@ from judge.models import Judge, Language, Problem, ProblemGroup, Profile, Submis
 from judge.views.user import UserList
 
 
+@override_settings(ALLOWED_HOSTS=['testserver'])
+class UserHoverCardTests(TestCase):
+    def test_profile_exposes_hover_target_and_exclusive_rank(self):
+        profile = Profile.objects.create(user=User.objects.create_user(username='rank-demo'), rating=3250)
+        self.assertNotContains(self.client.get(reverse('user_list')), '5P')
+        response = self.client.get(reverse('user_page', args=[profile.user.username]))
+        self.assertContains(response, '>5P</span>')
+        self.assertContains(response, 'data-user-card="/user/rank-demo/card"', count=2)
+
+    def test_public_card_shows_stats_without_private_fields(self):
+        profile = Profile.objects.create(
+            user=User.objects.create_user(username='go-player', email='private@example.com'),
+            username_display_override='<b>Demo</b>', rating=3250,
+            performance_points=2468, problem_count=256, notes='private admin note',
+        )
+        response = self.client.get(reverse('user_hovercard', args=[profile.user.username]))
+        self.assertContains(response, '3250 (5P)')
+        self.assertNotContains(response, '@go-player')
+        self.assertNotContains(response, '3250 · 5P')
+        self.assertContains(response, '5 Pro dan')
+        self.assertContains(response, '2468')
+        self.assertContains(response, '256')
+        self.assertContains(response, '&lt;b&gt;Demo&lt;/b&gt;')
+        self.assertNotContains(response, 'private@example.com')
+        self.assertNotContains(response, 'private admin note')
+        profile.rating = None
+        profile.save(update_fields=['rating'])
+        self.assertContains(self.client.get(reverse('user_hovercard', args=[profile.user.username])), 'Unrated')
+        self.assertEqual(self.client.get(reverse('user_hovercard', args=['missing-user'])).status_code, 404)
+
+
 @override_settings(ALLOWED_HOSTS=['testserver'],
                    CACHES={'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}})
 class UserLeaderboardTests(TestCase):

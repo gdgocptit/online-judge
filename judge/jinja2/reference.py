@@ -11,7 +11,7 @@ from lxml.html import Element
 
 from judge import lxml_tree
 from judge.models import Contest, Problem, Profile
-from judge.ratings import rating_class, rating_name, rating_short_name
+from judge.ratings import rating_class, rating_name
 from . import registry
 
 rereference = re.compile(r'\[(r?user):(\w+)\]')
@@ -41,11 +41,8 @@ def get_user_rating(username, data):
     if rating is not None:
         rating_css = rating_class(rating)
         element.set('title', str(rating_name(rating)))
-        rate_box = Element('span', {'class': 'rating ' + rating_css})
-        rate_box.text = rating_short_name(rating) + ' '
         user = Element('span', {'class': 'rating ' + rating_css})
         user.text = username
-        element.append(rate_box)
         element.append(user)
     else:
         element.text = username

@@ -1,8 +1,57 @@
 @use "vars" as *;
 
+#user-hovercard {
+    position: fixed;
+    z-index: 1000;
+    box-sizing: border-box;
+    width: 290px;
+    max-width: calc(100vw - 16px);
+    padding: 16px;
+    border: 1px solid $color_primary25;
+    border-radius: $widget_border_radius;
+    background: $color_primary0;
+    color: $color_primary90;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+
+    .user-card-heading {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        > div { min-width: 0; overflow-wrap: anywhere; }
+        img { flex-shrink: 0; border-radius: $widget_border_radius; }
+        strong { display: block; font-size: 1.1em; }
+    }
+    .user-card-rank { color: $color_primary66; font-size: 0.9em; }
+    .user-card-rating {
+        margin: 14px 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        > span:first-child { color: $color_primary66; }
+    }
+    .user-card-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin: 0;
+        padding-top: 12px;
+        border-top: 1px solid $color_primary25;
+        dt { font-size: 0.85em; color: $color_primary66; }
+        dd { margin: 4px 0 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+    }
+}
+
 td.user-name {
     padding-left: 2em;
     text-align: left;
+}
+
+.user-go-rank {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: normal;
+    line-height: 1.5;
 }
 
 tr:target {

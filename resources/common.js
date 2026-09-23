@@ -338,3 +338,71 @@ $(function () {
         $closer.parent().fadeOut(200);
     });
 });
+
+$(function () {
+    var $card = $('<div id="user-hovercard" role="tooltip" hidden>').appendTo('body');
+    var active = null, timer = null, request = null, describedBy = null;
+    var cache = Object.create(null);
+    var targets = 'a[href*="/user/"], [data-user-card]';
+
+    function close() {
+        clearTimeout(timer);
+        if (request) request.abort();
+        request = null;
+        if (active) {
+            if (describedBy == null) $(active).removeAttr('aria-describedby');
+            else $(active).attr('aria-describedby', describedBy);
+        }
+        active = null;
+        $card.prop('hidden', true);
+    }
+
+    function show(link, html) {
+        if (active !== link || !document.contains(link)) return;
+        $card.html(html).prop('hidden', false);
+        $(link).attr('aria-describedby', [describedBy, 'user-hovercard'].filter(Boolean).join(' '));
+        var anchor = link.getBoundingClientRect();
+        var rect = $card[0].getBoundingClientRect();
+        var top = anchor.bottom + 6;
+        if (top + rect.height > window.innerHeight - 8) top = anchor.top - rect.height - 6;
+        $card.css({
+            left: Math.max(8, Math.min(anchor.left, window.innerWidth - rect.width - 8)),
+            top: Math.max(8, top)
+        });
+    }
+
+    $(document).on('mouseenter focusin', targets, function () {
+        var link = this;
+        var url = $(link).attr('data-user-card');
+        if (!url) {
+            if (link.origin !== window.location.origin || !/^\/user\/[^/]+\/?$/.test(link.pathname)) return;
+            url = link.pathname.replace(/\/$/, '') + '/card';
+        }
+        if (active === link && !$card.prop('hidden')) {
+            clearTimeout(timer);
+            return;
+        }
+        close();
+        active = link;
+        describedBy = $(link).attr('aria-describedby');
+        timer = setTimeout(function () {
+            if (cache[url]) show(link, cache[url]);
+            else request = $.get(url).done(function (html) {
+                cache[url] = html;
+                show(link, html);
+            });
+        }, 800);
+    }).on('mouseleave focusout', targets, function () {
+        if (active === this) {
+            clearTimeout(timer);
+            timer = setTimeout(close, 100);
+        }
+    }).on('keydown', function (event) {
+        if (event.key === 'Escape') close();
+    });
+
+    $card.on('mouseenter', function () { clearTimeout(timer); })
+        .on('mouseleave', function () { timer = setTimeout(close, 100); });
+    $(window).on('resize', close);
+    document.addEventListener('scroll', close, true);
+});

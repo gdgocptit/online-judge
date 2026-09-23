@@ -1,5 +1,13 @@
 {% extends "tabs-base.html" %}
 
+{% block tab_title %}
+    <span class="rating {{ rating_class(user) }}" tabindex="0"
+          data-user-card="{{ url('user_hovercard', user.user.username) }}">{{ user.display_name }}</span>
+    {% if user.rating is not none %}
+        <span class="user-go-rank {{ rating_class(user) }}" title="{{ rating_name(user) }}">{{ rating_short_name(user) }}</span>
+    {% endif %}
+{% endblock %}
+
 {% block tabs %}
     {{ make_tab('about', 'fa-info-circle', url('user_page', user.user.username), _('About')) }}
     {{ make_tab('problems', 'fa-puzzle-piece', url('user_problems', user.user.username), _('Problems')) }}

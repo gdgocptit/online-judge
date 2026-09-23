@@ -115,6 +115,7 @@
             <div id="rating-tooltip">
                 <div class="contest"></div>
                 <div class="date"></div>
+                <div class="rating-rank"></div>
                 <div class="rate-group">
                     <span class="rate-box"><span></span></span>
                     <span class="rating"></span>, #<span class="rank"></span>
@@ -259,7 +260,8 @@
                                 $tooltip.find('.date').text(item.date);
                                 $tooltip.find('.rate-box').attr('class', 'rate-box ' + item.class)
                                         .find('span').css('height', item.height);
-                                $tooltip.find('.rating').text(item.rating + ' · ' + item.rank_short_name)
+                                $tooltip.find('.rating-rank').text(item.rank_name);
+                                $tooltip.find('.rating').text(item.rating)
                                         .attr('class', 'rating ' + item.class).attr('title', item.rank_name);
                                 $tooltip.find('.rank').text(item.ranking);
 

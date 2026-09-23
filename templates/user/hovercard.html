@@ -1,0 +1,18 @@
+<div class="user-card-heading">
+    <img src="{{ gravatar(user, 96) }}" width="48" height="48" alt="">
+    <div>
+        <strong class="{{ user.css_class }}">{{ user.display_name }}</strong>
+        <span class="user-card-rank">{{ rating_name(user) }}</span>
+    </div>
+</div>
+<div class="user-card-rating">
+    <span>{{ _('Rating') }}</span>
+    <span class="rating {{ rating_class(user) }}">
+        {% if user.rating is not none %}{{ user.rating }} ({{ rating_short_name(user) }}){% else %}{{ _('Unrated') }}{% endif %}
+    </span>
+</div>
+<dl class="user-card-stats">
+    <div><dt>{{ _('Points') }}</dt><dd>{{ user.performance_points|floatformat(0) }}</dd></div>
+    <div><dt>{{ _('Problems') }}</dt><dd>{{ user.problem_count }}</dd></div>
+    <div><dt title="{{ _('Rated contests') }}">{{ _('Contests') }}</dt><dd>{{ user.rated_contests }}</dd></div>
+</dl>

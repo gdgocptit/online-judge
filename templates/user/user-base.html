@@ -11,7 +11,8 @@
 {% block body %}
     <div class="user-info-page">
         <div class="user-sidebar">
-            <img src="{{ gravatar(user, 135) }}" class="user-gravatar">
+            <img src="{{ gravatar(user, 135) }}" class="user-gravatar"
+                 data-user-card="{{ url('user_hovercard', user.user.username) }}">
             <br>
 
             <div><b>

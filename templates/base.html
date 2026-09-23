@@ -170,7 +170,7 @@
             {% if request.user.is_authenticated %}
                 <ul>
                     <li>
-                        <a href="{{ url('user_page') }}">
+                        <a href="{{ url('user_page', request.user.username) }}">
                             <span>
                                 <img src="{{ gravatar(request.user, 32) }}" height="24" width="24">{# -#}
                                 <span>{{ _('Hello, %(username)s.', username=bold(request.profile.display_name)) }}</span>

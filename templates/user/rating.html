@@ -8,7 +8,7 @@
             </svg>
         {% endif %}
         <span class="rating {{ rating_class(rating) }}">
-            {% if rating_class(rating) != 'rate-none' %}{{ rating.rating|default(rating) }} · {% endif %}{{ rating_short_name(rating) }}
+            {% if rating_class(rating) != 'rate-none' %}{{ rating.rating|default(rating) }}{% else %}{{ _('Unrated') }}{% endif %}
         </span>
     </span>
 {% endspaceless %}

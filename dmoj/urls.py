@@ -167,6 +167,7 @@ urlpatterns = [
     path('data/download/', user.UserDownloadData.as_view(), name='user_download_data'),
     path('user/<str:user>', include([
         path('', user.UserAboutPage.as_view(), name='user_page'),
+        path('/card', user.UserHoverCard.as_view(), name='user_hovercard'),
         path('/solved', include([
             path('', user.UserProblemsPage.as_view(), name='user_problems'),
             path('/ajax', user.UserPerformancePointsAjax.as_view(), name='user_pp_ajax'),

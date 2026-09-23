@@ -40,7 +40,9 @@ class GoRankTests(SimpleTestCase):
                 with self.subTest(value=value, obj=obj):
                     html = render_to_string('user/rating.html', {'rating': obj})
                     self.assertIn(f'title="{long}"', html)
-                    self.assertIn(f'{value} · {short}', html)
+                    self.assertRegex(html, rf'class="rating [^"]+">\s*{value}\s*</span>')
+                    self.assertNotIn(f' · {short}', html)
+                    self.assertEqual(get_short_name(obj), short)
         for obj in (None, SimpleNamespace(rating=None)):
             self.assertEqual(get_short_name(obj), 'Unrated')
             self.assertEqual(get_name(obj), 'Unrated')
