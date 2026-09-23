@@ -3,7 +3,7 @@
 #problem-table {
     td, th {
         // Text columns are left-aligned
-        &.problem, &.category, &.types {
+        &.problem, &.types {
             text-align: left;
             padding: 0 1rem;
         }
@@ -487,12 +487,6 @@ body[data-layout^="problem"] {
 
 @media (max-width: 450px) {
     #problem-table tr .ac-rate {
-        display: none;
-    }
-}
-
-@media (max-width: 350px) {
-    #problem-table tr .category {
         display: none;
     }
 }
