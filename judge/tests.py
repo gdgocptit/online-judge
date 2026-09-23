@@ -5,12 +5,29 @@ from django.contrib.auth.models import User
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
+from judge.jinja2.reference import get_user, get_user_info, get_user_rating
 from judge.models import Judge, Language, Problem, ProblemGroup, Profile, Submission
 from judge.views.user import UserList
 
 
 @override_settings(ALLOWED_HOSTS=['testserver'])
 class UserHoverCardTests(TestCase):
+    def test_privileged_names_keep_separate_rating_colors(self):
+        for role in ('is_staff', 'is_superuser'):
+            with self.subTest(role=role):
+                account = User.objects.create_user(username=role, **{role: True})
+                Profile.objects.create(user=account, rating=3250)
+                response = self.client.get(reverse('user_hovercard', args=[account.username]))
+                self.assertContains(response, f'<strong class="admin">{account.username}</strong>')
+                self.assertContains(response, '<span class="rating rate-pro-dan">3250 (5P)</span>', html=True)
+                response = self.client.get(reverse('user_page', args=[account.username]))
+                self.assertContains(response, '<span class="admin" tabindex="0"')
+                response = self.client.get(reverse('user_search_select2_ajax'), {'term': account.username})
+                self.assertEqual(response.json()['results'][0]['rank_class'], 'admin')
+                data = get_user_info([account.username])[account.username]
+                self.assertEqual(get_user(account.username, data).get('class'), 'admin')
+                self.assertEqual(get_user_rating(account.username, data)[0].get('class'), 'admin')
+
     def test_profile_exposes_hover_target_and_exclusive_rank(self):
         profile = Profile.objects.create(user=User.objects.create_user(username='rank-demo'), rating=3250)
         self.assertNotContains(self.client.get(reverse('user_list')), '5P')

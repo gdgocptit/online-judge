@@ -11,7 +11,7 @@ from lxml.html import Element
 
 from judge import lxml_tree
 from judge.models import Contest, Problem, Profile
-from judge.ratings import rating_class, rating_name
+from judge.ratings import rating_name
 from . import registry
 
 rereference = re.compile(r'\[(r?user):(\w+)\]')
@@ -23,7 +23,8 @@ def get_user(username, data):
         element.text = username
         return element
 
-    element = Element('span', {'class': Profile.get_user_css_class(*data)})
+    rank, rating, is_privileged = data
+    element = Element('span', {'class': Profile.get_user_css_class(rank, rating, is_privileged=is_privileged)})
     link = Element('a', {'href': reverse('user_page', args=[username])})
     link.text = username
     element.append(link)
@@ -36,23 +37,20 @@ def get_user_rating(username, data):
         element.text = username
         return element
 
-    rating = data[1]
+    rank, rating, is_privileged = data
     element = Element('a', {'class': 'rate-group', 'href': reverse('user_page', args=[username])})
     if rating is not None:
-        rating_css = rating_class(rating)
         element.set('title', str(rating_name(rating)))
-        user = Element('span', {'class': 'rating ' + rating_css})
-        user.text = username
-        element.append(user)
-    else:
-        element.text = username
+    user = Element('span', {'class': Profile.get_user_css_class(rank, rating, is_privileged=is_privileged)})
+    user.text = username
+    element.append(user)
     return element
 
 
 def get_user_info(usernames):
-    return {name: (rank, rating) for name, rank, rating in
+    return {name: (rank, rating, is_staff or is_superuser) for name, rank, rating, is_staff, is_superuser in
             Profile.objects.filter(user__username__in=usernames)
-                   .values_list('user__username', 'display_rank', 'rating')}
+                   .values_list('user__username', 'display_rank', 'rating', 'user__is_staff', 'user__is_superuser')}
 
 
 reference_map = {

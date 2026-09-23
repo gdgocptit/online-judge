@@ -318,14 +318,18 @@ class Profile(models.Model):
         return self.user.username
 
     @classmethod
-    def get_user_css_class(cls, display_rank, rating, rating_colors=settings.DMOJ_RATING_COLORS):
+    def get_user_css_class(cls, display_rank, rating, rating_colors=settings.DMOJ_RATING_COLORS,
+                           *, is_privileged=False):
+        if is_privileged:
+            return 'admin'
         if rating_colors:
             return 'rating %s %s' % (rating_class(rating) if rating is not None else 'rate-none', display_rank)
         return display_rank
 
     @cached_property
     def css_class(self):
-        return self.get_user_css_class(self.display_rank, self.rating)
+        return self.get_user_css_class(self.display_rank, self.rating,
+                                       is_privileged=self.user.is_staff or self.user.is_superuser)
 
     @cached_property
     def webauthn_id(self):

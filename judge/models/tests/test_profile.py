@@ -109,6 +109,16 @@ class ProfileTestCase(CommonDataMixin, TestCase):
     def test_css_class(self):
         self.assertEqual(self.profile.css_class, 'rating rate-none user')
 
+    def test_privileged_username_ignores_rating(self):
+        for is_staff, is_superuser in ((True, False), (False, True), (True, True)):
+            for rating in (None, 0, 3250):
+                with self.subTest(is_staff=is_staff, is_superuser=is_superuser, rating=rating):
+                    user = self.users['normal']
+                    user.is_staff, user.is_superuser = is_staff, is_superuser
+                    profile = Profile(user=user, rating=rating)
+                    self.assertEqual(profile.css_class, 'admin')
+                    self.assertEqual(profile.rating, rating)
+
     def test_get_user_css_class(self):
         self.assertEqual(
             Profile.get_user_css_class(display_rank='abcdef', rating=None, rating_colors=True),

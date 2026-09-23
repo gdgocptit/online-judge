@@ -302,7 +302,10 @@ body[data-layout^="problem"] {
     }
 
     .problem-statement { padding: 24px 32px; }
-    .problem-title { padding: 0 0 20px; }
+    .problem-title {
+        align-items: center;
+        padding: 0 0 20px;
+    }
     .problem-limits {
         display: flex;
         flex-wrap: wrap;
@@ -454,6 +457,25 @@ body[data-layout^="problem"] {
         font-weight: 600;
         padding: 0.2em 0;
         text-align: right;
+    }
+}
+
+.problem-editor-dropdown {
+    overflow-y: auto;
+
+    &#language-select2 {
+        .select2-results {
+            columns: auto;
+            padding: 0;
+        }
+
+        .select2-results__options {
+            overflow-y: auto !important;
+        }
+
+        .select2-results__option {
+            padding: 6px;
+        }
     }
 }
 

@@ -1,7 +1,7 @@
 {% extends "tabs-base.html" %}
 
 {% block tab_title %}
-    <span class="rating {{ rating_class(user) }}" tabindex="0"
+    <span class="{{ user.css_class }}" tabindex="0"
           data-user-card="{{ url('user_hovercard', user.user.username) }}">{{ user.display_name }}</span>
     {% if user.rating is not none %}
         <span class="user-go-rank {{ rating_class(user) }}" title="{{ rating_name(user) }}">{{ rating_short_name(user) }}</span>

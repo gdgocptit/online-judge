@@ -96,6 +96,22 @@
                     dropdown.attr('id', 'judge-select2');
                 });
 
+                $('.problem-workspace select#id_language, .problem-workspace select#id_judge').each(function () {
+                    var dropdown = $(this).data('select2').dropdown;
+                    var positionDropdown = dropdown._positionDropdown;
+                    dropdown.$dropdown.addClass('problem-editor-dropdown');
+                    dropdown._positionDropdown = function () {
+                        var availableHeight = this.$container[0].getBoundingClientRect().top - 8;
+                        this.$dropdown.css('max-height', Math.max(0, availableHeight));
+                        positionDropdown.call(this);
+                        this.$dropdown.removeClass('select2-dropdown--below').addClass('select2-dropdown--above');
+                        this.$container.removeClass('select2-container--below').addClass('select2-container--above');
+                        // Keep Select2's parent-relative offset, but anchor the bottom to the control's top.
+                        this.$dropdownContainer.css('top', parseFloat(this.$dropdownContainer.css('top')) +
+                            this.$container.offset().top - this.$dropdown.offset().top - this.$dropdown.outerHeight());
+                    };
+                });
+
                 $('#id_language').change(function () {
                     var lang = $("#id_language").find("option:selected").attr('data-ace');
                     window.ace_source.getSession().setMode("ace/mode/" + lang);
