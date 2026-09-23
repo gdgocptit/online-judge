@@ -256,11 +256,6 @@ body[data-layout^="problem"] {
     .problem-title h2 { margin: 0; font-size: 1.5em; }
 }
 
-body[data-layout="problem-contest"] #content {
-    margin-top: 70px;
-    height: calc(100dvh - 70px);
-}
-
 .workspace-sr-only {
     position: absolute;
     width: 1px;
@@ -402,6 +397,10 @@ body[data-layout="problem-contest"] #content {
         #problem_submit .submission-controls { padding: 16px; }
         #language { width: 160px; }
     }
+}
+
+@media (max-width: 760px) {
+    body[data-layout^="problem"] #content { margin-top: 36px; }
 }
 
 #language-select2 {
