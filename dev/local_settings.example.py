@@ -5,8 +5,8 @@ from pathlib import Path
 SECRET_KEY = 'local-development-only-do-not-deploy-this-key-to-production'
 DEBUG = True
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
-SITE_NAME = 'FPT Online Judge'
-SITE_LONG_NAME = 'GDG on Campus: PTIT'
+SITE_NAME = 'GDG on Campus: PTIT Online Judge'
+SITE_LONG_NAME = 'GDG on Campus: PTIT Online Judge'
 TIME_ZONE = DEFAULT_USER_TIME_ZONE = 'Asia/Ho_Chi_Minh'
 DEFAULT_USER_LANGUAGE = 'CPP17'
 DATABASES = {'default': {
