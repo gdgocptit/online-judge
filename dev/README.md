@@ -40,8 +40,11 @@ Tác vụ nền cần terminal riêng, đã kích hoạt `.venv`:
 celery -A dmoj_celery worker --pool=solo --loglevel=INFO
 ```
 
-Cấu hình này dành cho phát triển web. Chấm bài cần Linux VM/container,
-bridge, runtime và judge key riêng; chưa được khởi chạy bởi Compose trên.
+Cấu hình này dành cho phát triển web. Máy chấm Elixir/Erlang local có hướng dẫn
+trong `judge-server/deploy/BEAM.md` ở repository máy chấm: chạy
+`python manage.py shell < dev/setup_beam.py`, giữ `python manage.py runbridged`
+chạy, rồi khởi động Compose BEAM theo hướng dẫn đó. Compose database/Redis
+ở trên không tự khởi động máy chấm.
 Xem tài liệu upstream và repository máy chấm để thiết lập phần này.
 Không dùng cấu hình hay mật khẩu local cho production.
 
