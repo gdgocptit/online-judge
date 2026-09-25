@@ -1,13 +1,55 @@
 import re
 from unittest.mock import patch
 
-from django.contrib.auth.models import User
-from django.test import TestCase, override_settings
+from django.contrib import admin
+from django.contrib.auth.models import Permission, User
+from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
 
 from judge.jinja2.reference import get_user, get_user_info, get_user_rating
 from judge.models import Judge, Language, Problem, ProblemGroup, Profile, Submission
 from judge.views.user import UserList
+
+
+class ProfileAdminRatingTests(TestCase):
+    def test_superusers_and_authorized_staff_can_edit_rating(self):
+        actor = User.objects.create_user(username='rating-admin', is_staff=True, is_superuser=True)
+        actor_profile = Profile.objects.create(user=actor, rating=1200)
+        other_profile = Profile.objects.create(user=User.objects.create_user(username='rating-user'), rating=1200)
+        request = RequestFactory().get('/admin/')
+        request.user, request.profile = actor, actor_profile
+        model_admin = admin.site._registry[Profile]
+
+        actor.user_permissions.add(Permission.objects.get(codename='change_profile', content_type__app_label='judge'))
+        for is_superuser in (True, False):
+            actor.is_superuser = is_superuser
+            actor.save()
+            request.user = User.objects.get(pk=actor.pk)
+            for profile in (actor_profile, other_profile):
+                self.assertTrue(model_admin.has_change_permission(request, profile))
+                form_class = model_admin.get_form(request, profile, change=True, fields=['rating'])
+                for value, expected in (('3250', 3250), ('0', 0), ('', None)):
+                    with self.subTest(superuser=is_superuser, user=profile.user.username, rating=value):
+                        form = form_class({'rating': value}, instance=profile)
+                        self.assertTrue(form.is_valid(), form.errors)
+                        form.save()
+                        profile.refresh_from_db()
+                        self.assertEqual(profile.rating, expected)
+                self.assertFalse(form_class({'rating': 'invalid'}, instance=profile).is_valid())
+
+        actor.user_permissions.clear()
+        actor.user_permissions.add(Permission.objects.get(codename='view_profile', content_type__app_label='judge'))
+        request.user = User.objects.get(pk=actor.pk)
+        self.assertFalse(model_admin.has_change_permission(request, other_profile))
+        form_class = model_admin.get_form(request, other_profile, change=True, fields=['rating'])
+        form = form_class({'rating': '9999'}, instance=other_profile)
+        self.assertNotIn('rating', form.fields)
+        self.assertTrue(form.is_valid(), form.errors)
+        form.save()
+        other_profile.refresh_from_db()
+        self.assertIsNone(other_profile.rating)
+        request.user.is_staff = False
+        self.assertFalse(admin.site.has_permission(request))
 
 
 @override_settings(ALLOWED_HOSTS=['testserver'])
