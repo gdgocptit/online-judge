@@ -45,6 +45,9 @@ trong `judge-server/deploy/BEAM.md` ở repository máy chấm: chạy
 `python manage.py shell < dev/setup_beam.py`, giữ `python manage.py runbridged`
 chạy, rồi khởi động Compose BEAM theo hướng dẫn đó. Compose database/Redis
 ở trên không tự khởi động máy chấm.
+Lệnh đăng ký ngôn ngữ đặt giới hạn riêng tối thiểu 2 giây cho Elixir/Erlang ở
+các bài có giới hạn chung thấp hơn, để tính thời gian khởi động BEAM. Giới hạn
+riêng đã cấu hình bởi quản trị viên được giữ nguyên.
 Xem tài liệu upstream và repository máy chấm để thiết lập phần này.
 Không dùng cấu hình hay mật khẩu local cho production.
 

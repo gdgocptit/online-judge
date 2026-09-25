@@ -2,7 +2,7 @@ from django.core.cache import cache
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-from judge.models import Language, Problem
+from judge.models import Language, LanguageLimit, Problem
 
 
 class Command(BaseCommand):
@@ -22,5 +22,9 @@ class Command(BaseCommand):
             })
             for problem in Problem.objects.all():
                 problem.allowed_languages.add(language)
+                if problem.time_limit < 2:
+                    LanguageLimit.objects.get_or_create(problem=problem, language=language, defaults={
+                        'time_limit': 2, 'memory_limit': problem.memory_limit,
+                    })
         cache.clear()
         self.stdout.write('ELIXIR and ERLANG registered and enabled on existing problems.')
