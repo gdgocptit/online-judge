@@ -196,6 +196,7 @@ class SubmissionSummary(LoginRequiredMixin, View):
         )
         return JsonResponse({
             'result': item.short_status or item.status,
+            'result_class': item.result_class or item.status,
             'label': item.long_status or item.get_status_display(),
             'finished': item.is_graded,
             'time': timezone.localtime(item.date).isoformat(),

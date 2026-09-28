@@ -283,10 +283,6 @@ body[data-layout^="problem"] {
     td:first-child { width: 1%; white-space: nowrap; font-weight: 600; }
     td:nth-child(2) { color: $color_primary75; white-space: nowrap; }
     td:last-child { width: 1%; text-align: right; }
-    .submission-result { font-weight: 600; }
-    .submission-result.is-accepted { color: $color_success100; }
-    .submission-result.is-failed { color: $color_danger100; }
-    .submission-result.is-pending { color: $color_primary75; }
     a { font-weight: 600; white-space: nowrap; }
 }
 .source-upload {

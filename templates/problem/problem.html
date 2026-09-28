@@ -147,7 +147,7 @@
                                     <tr>
                                         <td>#{{ loop.index }}</td>
                                         <td>{{ previous_submission.date|date(_('N j, Y, g:i a')) }}</td>
-                                        <td class="submission-result{% if previous_submission.is_graded %}{% if previous_submission.short_status == 'AC' %} is-accepted{% else %} is-failed{% endif %}{% else %} is-pending{% endif %}">
+                                        <td class="submission-result case-{{ previous_submission.result_class or previous_submission.status }}">
                                             {{ previous_submission.long_status or previous_submission.get_status_display() }}
                                         </td>
                                         <td><a href="{{ url('submission_status', previous_submission.id) }}">{{ _('Show') }}</a></td>

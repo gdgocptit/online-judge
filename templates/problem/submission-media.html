@@ -164,7 +164,7 @@
                     var row = $('<tr>');
                     var attempt = $('<td>').text('#' + ($('#submission-results-body tr').length + 1));
                     var submittedAt = $('<td>').text('—');
-                    var result = $('<td>').addClass('submission-result is-pending').text({{ _('Submitting…')|htmltojs }});
+                    var result = $('<td>').addClass('submission-result').text({{ _('Submitting…')|htmltojs }});
                     var show = $('<td>');
                     row.append(attempt, submittedAt, result, show);
                     $('#submission-results-body').append(row);
@@ -195,9 +195,9 @@
                                 if (finished) return;
                                 submittedAt.text(new Date(status.time).toLocaleString());
                                 result.text(status.label);
-                                result.removeClass('is-accepted is-failed is-pending');
-                                result.addClass(status.finished ?
-                                    (status.result === 'AC' ? 'is-accepted' : 'is-failed') : 'is-pending');
+                                result.removeClass('case-AC case-_AC case-WA case-TLE case-MLE case-OLE case-IR ' +
+                                    'case-RTE case-SC case-CE case-IE case-AB case-QU case-P case-G');
+                                result.addClass('case-' + status.result_class);
                                 if (status.finished) finished = true;
                             }).fail(function () {
                                 result.text({{ _('Status unavailable')|htmltojs }});
