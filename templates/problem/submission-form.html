@@ -68,3 +68,19 @@
             </div>
         </div>
     </form>
+    <section id="submission-results" class="submission-results" aria-live="polite" hidden>
+        <p id="submission-feedback" role="status"></p>
+        <div class="submission-results-scroll">
+            <table class="submission-results-table">
+                <thead>
+                    <tr>
+                        <th scope="col">{{ _('Attempt') }}</th>
+                        <th scope="col">{{ _('Submission time') }}</th>
+                        <th scope="col">{{ _('Overall result') }}</th>
+                        <th scope="col"><span class="workspace-sr-only">{{ _('Details') }}</span></th>
+                    </tr>
+                </thead>
+                <tbody id="submission-results-body"></tbody>
+            </table>
+        </div>
+    </section>

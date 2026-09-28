@@ -26,6 +26,7 @@ from django.views.generic import DetailView, ListView, View
 from django.views.generic.detail import SingleObjectMixin
 from reversion import revisions
 
+from judge import event_poster as event
 from judge.comments import CommentedDetailView
 from judge.forms import ProblemCloneForm, ProblemPointsVoteForm, ProblemSubmitForm
 from judge.models import ContestSubmission, Judge, Language, Problem, ProblemGroup, ProblemPointsVote, \
@@ -738,7 +739,21 @@ class ProblemSubmit(LoginRequiredMixin, ProblemMixin, TitleMixin, SingleObjectFo
         self.new_submission.source = source
         self.new_submission.judge(force_judge=True, judge_id=form.cleaned_data['judge'])
 
+        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'summary_url': reverse('submission_summary', args=(self.new_submission.id,)),
+                'show_url': reverse('submission_status', args=(self.new_submission.id,)),
+                'channel': 'sub_%s' % self.new_submission.id_secret,
+                'last_msg': event.last(),
+            })
         return super().form_valid(form)
+
+    def form_invalid(self, form):
+        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            errors = {field: [str(error) for error in field_errors]
+                      for field, field_errors in form.errors.items()}
+            return JsonResponse({'errors': errors}, status=400)
+        return super().form_invalid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

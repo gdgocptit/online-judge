@@ -151,6 +151,7 @@ urlpatterns = [
 
     path('submission/<int:submission>', include([
         path('', submission.SubmissionStatus.as_view(), name='submission_status'),
+        path('/summary', submission.SubmissionSummary.as_view(), name='submission_summary'),
         path('/abort', submission.abort_submission, name='submission_abort'),
     ])),
 

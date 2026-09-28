@@ -17,7 +17,7 @@ from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _, gettext_lazy
 from django.views.decorators.http import require_POST
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, ListView, View
 
 from judge import event_poster as event
 from judge.highlight_code import highlight_code
@@ -187,6 +187,19 @@ class SubmissionStatus(SubmissionDetailBase):
         else:
             context['time_limit'] = lang_limit.time_limit
         return context
+
+
+class SubmissionSummary(LoginRequiredMixin, View):
+    def get(self, request, submission):
+        item = get_object_or_404(
+            Submission.objects.select_related('problem'), id=submission, user=request.profile,
+        )
+        return JsonResponse({
+            'result': item.short_status or item.status,
+            'label': item.long_status or item.get_status_display(),
+            'finished': item.is_graded,
+            'time': timezone.localtime(item.date).isoformat(),
+        })
 
 
 class SubmissionTestCaseQuery(SubmissionStatus):
