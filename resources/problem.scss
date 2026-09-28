@@ -329,10 +329,12 @@ body[data-layout^="problem"] {
             color: $color_primary75 !important;
             background: transparent !important;
             border: 0 !important;
+            outline: none;
             list-style: none;
             cursor: pointer;
 
             &:hover { color: $color_primary100 !important; background: $color_primary10 !important; }
+            &:focus-visible { outline: 2px solid $color_link75; outline-offset: 2px; }
         }
         > summary::-webkit-details-marker { display: none; }
     }
@@ -340,6 +342,7 @@ body[data-layout^="problem"] {
         position: absolute;
         z-index: 20;
         top: calc(100% + 4px);
+        left: auto;
         right: 0;
         width: 220px;
         max-width: calc(100vw - 32px);
