@@ -164,7 +164,7 @@
                     var row = $('<tr>');
                     var attempt = $('<td>').text('#' + ($('#submission-results-body tr').length + 1));
                     var submittedAt = $('<td>').text('—');
-                    var result = $('<td>').addClass('submission-result is-pending').text({{ _('Submitting…')|htmltojs });
+                    var result = $('<td>').addClass('submission-result is-pending').text({{ _('Submitting…')|htmltojs }});
                     var show = $('<td>');
                     row.append(attempt, submittedAt, result, show);
                     $('#submission-results-body').append(row);
