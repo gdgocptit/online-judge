@@ -255,7 +255,12 @@ $(function () {
 
     $('form').submit(function (evt) {
         // Prevent multiple submissions of forms, see #565, #1776
-        $("button[type=submit], input[type=submit]").prop('disabled', true);
+        $("button[type=submit]:not(:disabled), input[type=submit]:not(:disabled)")
+            .attr('data-submit-pending', '').prop('disabled', true);
+    });
+
+    $(window).on('pageshow', function () {
+        $('[data-submit-pending]').prop('disabled', false).removeAttr('data-submit-pending');
     });
 });
 
