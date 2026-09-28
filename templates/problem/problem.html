@@ -117,6 +117,25 @@
                 {{ _('View as PDF') }}
             </a>
         {% endif %}
+        {% if can_edit_problem %}
+            <details class="problem-actions">
+                <summary class="button" aria-label="{{ _('Problem actions') }}" title="{{ _('Problem actions') }}">
+                    <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                </summary>
+                <nav class="problem-actions-dropdown" aria-label="{{ _('Problem actions') }}">
+                    <a href="{{ url('problem_ticket_list', problem.code) }}">
+                        {{ _('Manage tickets') }}{% if num_open_tickets %} <span class="badge">{{ num_open_tickets }}</span>{% endif %}
+                    </a>
+                    <a href="{{ url('admin:judge_problem_change', problem.id) }}">{{ _('Edit problem') }}</a>
+                    {% if not problem.is_manually_managed %}
+                        <a href="{{ url('problem_data', problem.code) }}">{{ _('Edit test data') }}</a>
+                    {% endif %}
+                    {% if problem.is_subs_manageable_by(request.user) %}
+                        <a href="{{ url('problem_manage_submissions', problem.code) }}">{{ _('Manage submissions') }}</a>
+                    {% endif %}
+                </nav>
+            </details>
+        {% endif %}
     </div>
 {% endblock %}
 
@@ -127,6 +146,11 @@
             <div class="problem-limits">
                 <span>{{ _('Time limit:') }} {{ problem.time_limit }}s</span>
                 <span>{{ _('Memory limit:') }} {{ problem.memory_limit|kbsimpleformat }}</span>
+                {% if editorial and editorial.is_accessible_by(request.user) and not request.in_contest %}
+                    <a href="{{ url('problem_editorial', problem.code) }}" class="problem-editorial-link">
+                        {{ _('Read editorial') }}
+                    </a>
+                {% endif %}
             </div>
             {% if form is defined %}
                 <section id="submission-results" class="submission-results" aria-live="polite"
@@ -232,33 +256,12 @@
         <div><a href="#" data-featherlight="{{ url('problem_vote_stats', problem.code) }}">{{ _('Voting statistics') }}</a></div>
     {% endif %}
 
-    {% if (editorial and editorial.is_accessible_by(request.user)) and not request.in_contest %}
-        <hr>
-        <div><a href="{{ url('problem_editorial', problem.code) }}">{{ _('Read editorial') }}</a></div>
-    {% endif %}
-    {% if can_edit_problem %}
-        <hr>
-        <div>
-            <a href="{{ url('problem_ticket_list', problem.code) }}">{{ _('Manage tickets') }}
-                {% if num_open_tickets %}<span class="badge">{{ num_open_tickets }}</span>{% endif %}
-            </a>
-        </div>
-        <div><a href="{{ url('admin:judge_problem_change', problem.id) }}">{{ _('Edit problem') }}</a></div>
-        {% if not problem.is_manually_managed %}
-            <div><a href="{{ url('problem_data', problem.code) }}">{{ _('Edit test data') }}</a></div>
-        {% endif %}
-    {% elif request.user.is_authenticated and has_tickets %}
+    {% if not can_edit_problem and request.user.is_authenticated and has_tickets %}
         <hr>
         <div>
             <a href="{{ url('problem_ticket_list', problem.code) }}">{{ _('My tickets') }}
                 {% if num_open_tickets %}<span class="badge">{{ num_open_tickets }}</span>{% endif %}
             </a>
-        </div>
-    {% endif %}
-
-    {% if problem.is_subs_manageable_by(request.user) %}
-        <div>
-            <a href="{{ url('problem_manage_submissions', problem.code) }}">{{ _('Manage submissions') }}</a>
         </div>
     {% endif %}
 

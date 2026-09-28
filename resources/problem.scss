@@ -314,6 +314,42 @@ body[data-layout^="problem"] {
         align-items: center;
         padding: 0 0 20px;
     }
+    .problem-actions {
+        position: relative;
+        flex: 0 0 auto;
+        margin-left: auto;
+
+        > summary {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            padding: 0;
+            list-style: none;
+            cursor: pointer;
+        }
+        > summary::-webkit-details-marker { display: none; }
+    }
+    .problem-actions-dropdown {
+        position: absolute;
+        z-index: 20;
+        top: calc(100% + 4px);
+        right: 0;
+        min-width: 190px;
+        padding: 4px 0;
+        background: $color_primary0;
+        border: 1px solid $color_primary25;
+        border-radius: $widget_border_radius;
+
+        a {
+            display: block;
+            padding: 8px 12px;
+            white-space: nowrap;
+
+            &:hover { background: $color_primary10; text-decoration: none; }
+        }
+    }
     .problem-limits {
         display: flex;
         flex-wrap: wrap;
@@ -322,6 +358,7 @@ body[data-layout^="problem"] {
         font-size: 0.9em;
         margin-bottom: 24px;
     }
+    .problem-editorial-link { font-weight: 600; }
     .content-description { display: flow-root; }
     .comment-heading {
         display: flex;
