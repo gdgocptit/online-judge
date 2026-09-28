@@ -327,13 +327,15 @@ body[data-layout^="problem"] {
             height: 34px;
             padding: 0;
             color: $color_primary75 !important;
-            background: transparent !important;
-            border: 0 !important;
+            background: none;
+            border: 0;
+            border-radius: 0;
+            box-shadow: none;
             outline: none;
             list-style: none;
             cursor: pointer;
 
-            &:hover { color: $color_primary100 !important; background: $color_primary10 !important; }
+            &:hover { color: $color_primary100 !important; }
             &:focus-visible { outline: 2px solid $color_link75; outline-offset: 2px; }
         }
         > summary::-webkit-details-marker { display: none; }
