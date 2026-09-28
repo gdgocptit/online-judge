@@ -175,6 +175,9 @@ class ProblemDetail(ProblemMixin, SolvedProblemMixin, CommentedDetailView):
         can_edit = self.object.is_editable_by(user)
         context['can_edit_problem'] = can_edit
         if authed:
+            context['previous_submissions'] = Submission.objects.filter(
+                user=user.profile, problem=self.object,
+            ).order_by('date', 'id')
             form = ProblemSubmitForm(
                 instance=Submission(user=user.profile, problem=self.object),
                 initial={'language': user.profile.language},

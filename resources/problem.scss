@@ -279,8 +279,6 @@ body[data-layout^="problem"] {
 .submission-tools { margin-bottom: 20px; }
 .submission-results {
     margin: 0 0 24px;
-    max-height: 180px;
-    overflow: auto;
     .submission-results-table { min-width: 540px; }
     td:first-child { width: 1%; white-space: nowrap; font-weight: 600; }
     td:nth-child(2) { color: $color_primary75; white-space: nowrap; }

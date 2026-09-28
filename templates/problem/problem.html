@@ -129,7 +129,8 @@
                 <span>{{ _('Memory limit:') }} {{ problem.memory_limit|kbsimpleformat }}</span>
             </div>
             {% if form is defined %}
-                <section id="submission-results" class="submission-results" aria-live="polite" hidden>
+                <section id="submission-results" class="submission-results" aria-live="polite"
+                         {% if not previous_submissions %}hidden{% endif %}>
                     <p id="submission-feedback" role="status"></p>
                     <div class="h-scrollable-table">
                         <table class="submission-results-table table striped">
@@ -141,7 +142,18 @@
                                     <th scope="col"><span class="workspace-sr-only">{{ _('Details') }}</span></th>
                                 </tr>
                             </thead>
-                            <tbody id="submission-results-body"></tbody>
+                            <tbody id="submission-results-body">
+                                {% for previous_submission in previous_submissions %}
+                                    <tr>
+                                        <td>#{{ loop.index }}</td>
+                                        <td>{{ previous_submission.date|date(_('N j, Y, g:i a')) }}</td>
+                                        <td class="submission-result{% if previous_submission.is_graded %}{% if previous_submission.short_status == 'AC' %} is-accepted{% else %} is-failed{% endif %}{% else %} is-pending{% endif %}">
+                                            {{ previous_submission.long_status or previous_submission.get_status_display() }}
+                                        </td>
+                                        <td><a href="{{ url('submission_status', previous_submission.id) }}">{{ _('Show') }}</a></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
                         </table>
                     </div>
                 </section>
