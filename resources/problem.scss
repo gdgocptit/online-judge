@@ -326,8 +326,13 @@ body[data-layout^="problem"] {
             width: 34px;
             height: 34px;
             padding: 0;
+            color: $color_primary75 !important;
+            background: transparent !important;
+            border: 0 !important;
             list-style: none;
             cursor: pointer;
+
+            &:hover { color: $color_primary100 !important; background: $color_primary10 !important; }
         }
         > summary::-webkit-details-marker { display: none; }
     }
@@ -336,15 +341,20 @@ body[data-layout^="problem"] {
         z-index: 20;
         top: calc(100% + 4px);
         right: 0;
-        min-width: 190px;
+        width: 220px;
+        max-width: calc(100vw - 32px);
         padding: 4px 0;
+        box-sizing: border-box;
         background: $color_primary0;
         border: 1px solid $color_primary25;
         border-radius: $widget_border_radius;
+        text-align: left;
 
         a {
             display: block;
             padding: 8px 12px;
+            color: $color_primary100;
+            text-decoration: none;
             white-space: nowrap;
 
             &:hover { background: $color_primary10; text-decoration: none; }
