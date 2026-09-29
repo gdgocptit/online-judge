@@ -370,11 +370,11 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
     context_object_name = 'problems'
     template_name = 'problem/list.html'
     paginate_by = 50
-    sql_sort = frozenset(('points', 'ac_rate', 'user_count', 'code'))
+    sql_sort = frozenset(('points', 'ac_rate', 'user_count', 'code', 'date'))
     manual_sort = frozenset(('name', 'group', 'solved', 'type', 'editorial'))
     all_sorts = sql_sort | manual_sort
-    default_desc = frozenset(('points', 'ac_rate', 'user_count'))
-    default_sort = 'code'
+    default_desc = frozenset(('points', 'ac_rate', 'user_count', 'date'))
+    default_sort = '-date'
 
     def get_paginator(self, queryset, per_page, orphans=0,
                       allow_empty_first_page=True, **kwargs):
@@ -385,7 +385,8 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
             queryset = queryset.add_i18n_name(self.request.LANGUAGE_CODE)
             sort_key = self.order.lstrip('-')
             if sort_key in self.sql_sort:
-                queryset = queryset.order_by(self.order, 'id')
+                tie_breaker = '-id' if sort_key == 'date' and self.order.startswith('-') else 'id'
+                queryset = queryset.order_by(self.order, tie_breaker)
             elif sort_key == 'name':
                 queryset = queryset.order_by(self.order.replace('name', 'i18n_name'), 'id')
             elif sort_key == 'group':
